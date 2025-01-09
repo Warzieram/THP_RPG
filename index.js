@@ -125,7 +125,7 @@ class Assassin extends Character{
     if(this.mana >= 20){
       this.dealDamage(victim, 7)
       if(victim.status !== "loser"){
-        this.hp -= 7
+        this.takeDamage(7)
       }
       this.shadowhit = true
       this.mana -= 20
@@ -288,6 +288,7 @@ class Game {
 
           case "2":
             if(player instanceof Assassin || player instanceof Paladin || player instanceof Fighter || player instanceof Wizard || player instanceof Thanos){
+              console.log("Sur qui ?")
 
               let targets = this.players.filter((p) => {
                 return p != player && p.status !== "loser"
