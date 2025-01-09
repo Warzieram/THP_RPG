@@ -43,8 +43,7 @@ class Fighter extends Character{
   }
 
   specialAttack(victim){
-    console.log(this)
-    if(this.mana > 20){
+    if(this.mana >= 20){
       this.dealDamage(victim, 5)
       this.mana -= 20
       this.darkvision = true
@@ -64,7 +63,7 @@ class Paladin extends Character{
   }
 
   specialAttack(victim){
-    if(this.mana > 40){
+    if(this.mana >= 40){
       this.dealDamage(victim, 4)
       this.hp += 5
       this.mana -= 40
@@ -83,7 +82,7 @@ class Monk extends Character{
   }
 
   specialAttack(){
-    if(this.mana > 25){
+    if(this.mana >= 25){
       this.hp += 8
       this.mana -= 25
       console.log("HEAL !")
@@ -123,7 +122,7 @@ class Assassin extends Character{
   }
 
   specialAttack(victim){
-    if(this.mana > 20){
+    if(this.mana >= 20){
       this.dealDamage(victim, 7)
       if(victim.status !== "loser"){
         this.hp -= 7
@@ -145,7 +144,7 @@ class Wizard extends Character {
   }
 
   specialAttack(victim){
-    if (this.mana > 25){
+    if (this.mana >= 25){
       this.dealDamage(victim, 7)
       console.log("FIREBALL !")
     }
@@ -163,10 +162,10 @@ class Thanos extends Character{
   }
 
   specialAttack(victim){
-    // L'attaque spéciale de Thanos est lançable une fois par partie et 
+    // L'attaque spéciale de Thanos 
     // permet d'avoir une chance sur deux de tuer l'ennemi instantanément
 
-    if(this.mana > 1){
+    if(this.mana >= 1){
 
       let ran = Math.random()
       if(ran < 0.5){
@@ -242,8 +241,14 @@ class Game {
         console.log("Que veux tu faire ?")
         console.log("1) Attaquer !")
         console.log(`2) ${player.special_attack_name}`)
-
-        let input = prompt()
+        let input = ""
+        if(player.is_ai){
+          let options = ["1", "2"]
+          input = options[Math.floor(Math.random() * 2)]
+        }
+        else{
+          input = prompt()
+        }
 
         switch (input) {
           case "1":
@@ -254,7 +259,22 @@ class Game {
             targets.forEach((target, index) => {
               console.log(`${index +1}) ${target.name}`)
             });
-            let choice = parseInt(prompt()) - 1;
+            let choice = ""
+            if(player.is_ai){
+              let killable_players = targets.filter((p) => {
+                return p.hp <= player.dmg 
+              });
+              if(killable_players.length != 0){
+                choice = Math.floor(Math.random() * killable_players.length)
+              }
+              else{ 
+                choice = Math.floor(Math.random() * targets.length)
+              }
+            }
+            else{
+              choice = parseInt(prompt()) - 1;
+            }
+
             if(choice < 0 || choice > this.players.length){
               console.log("Entrée incorrecte, votre tour a été passé !")
             }
@@ -275,7 +295,14 @@ class Game {
               targets.forEach((target, index) => {
                 console.log(`${index +1}) ${target.name}`)
               });
-              let choice = parseInt(prompt()) - 1
+              let choice = ""
+              if(player.is_ai){
+                choice = Math.floor(Math.random() * targets.length)
+              }
+              else{
+                choice = parseInt(prompt()) - 1
+              }
+              console.log(choice)
               player.specialAttack(targets[choice])
             }
             else{
@@ -304,6 +331,7 @@ class Game {
       new_instance.name = `Joueur ${i+1}`
       this.players.push(new_instance)
     }
+    this.players[0].is_ai = true
     console.log(this)
     this.startTurn();
   }
